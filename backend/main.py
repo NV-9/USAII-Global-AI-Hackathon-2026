@@ -11,9 +11,9 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 import db
-from config import APP_TITLE, APP_VERSION, APP_DESCRIPTION, PLATFORM_WEBHOOKS
+from config import APP_TITLE, APP_VERSION, APP_DESCRIPTION, PLATFORM_WEBHOOKS, NLP_SERVICE_URL
 from models.schemas import HealthResponse
-from routers import analyse, alerts, feedback
+from routers import analyse, alerts, feedback, escalations
 
 _start_time = time.monotonic()
 
@@ -44,6 +44,7 @@ app.add_middleware(
 app.include_router(analyse.router)
 app.include_router(alerts.router)
 app.include_router(feedback.router)
+app.include_router(escalations.router)
 
 
 @app.get("/health", response_model=HealthResponse, tags=["Meta"], summary="API health check")
@@ -51,7 +52,7 @@ def health() -> HealthResponse:
     return HealthResponse(
         status="ok",
         version=APP_VERSION,
-        nlp_backend="rule-based (plug-in model slot available)",
+        nlp_backend=f"model service at {NLP_SERVICE_URL} (rule-based fallback if unreachable)",
         platform_count=len(PLATFORM_WEBHOOKS),
         uptime_seconds=round(time.monotonic() - _start_time, 2),
     )

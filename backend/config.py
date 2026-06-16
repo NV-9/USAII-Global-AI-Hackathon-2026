@@ -21,6 +21,10 @@ RISK_THRESHOLDS = {
 HUMAN_REVIEW_THRESHOLD = 70
 MIN_CONFIDENCE_FOR_AUTO_ACTION = 0.60
 
+FRAUD_ANALYST_RISK_THRESHOLD = 90
+FRAUD_ANALYST_MIN_OVERRIDES = 1
+FRAUD_ANALYST_MIN_FLAGGED_MESSAGES = 2
+
 PLATFORM_WEBHOOKS: Dict[str, str] = {
     "paypal":   "http://localhost:9001/webhook/paypal",
     "venmo":    "http://localhost:9001/webhook/venmo",

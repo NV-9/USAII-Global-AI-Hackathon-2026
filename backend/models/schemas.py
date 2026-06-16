@@ -20,6 +20,17 @@ class FeedbackActionEnum(str, Enum):
     CONFIRM = "confirm"       # user agrees it is a scam
     DISMISS = "dismiss"       # user says it is a false positive
     ESCALATE = "escalate"     # user wants human review
+    OVERRIDE = "override"     # user attempted to proceed despite the warning
+
+
+class EscalationStatusEnum(str, Enum):
+    PENDING = "PENDING"
+    RESOLVED = "RESOLVED"
+
+
+class EscalationResolutionEnum(str, Enum):
+    CONFIRMED_FRAUD = "confirmed_fraud"
+    RELEASED = "released"
 
 
 class AnalyseRequest(BaseModel):
@@ -63,6 +74,9 @@ class AnalyseResponse(BaseModel):
     requires_human_review: bool
     alert_triggered: bool
     alert_id: Optional[str] = Field(None, description="ID of the alert broadcast if one was fired.")
+    escalation_triggered: bool = Field(False, description="True if this analysis just triggered a new fraud-analyst escalation.")
+    escalation_id: Optional[str] = Field(None, description="ID of the escalation record if one was created.")
+    override_locked: bool = Field(False, description="True if this conversation has a pending escalation — overrides are rejected until an analyst resolves it.")
     analysed_at: datetime
 
 
@@ -77,6 +91,7 @@ class PlatformAlertResult(BaseModel):
 class AlertRecord(BaseModel):
     alert_id: str
     analysis_id: str
+    session_id: Optional[str] = None
     risk_score: int
     risk_level: RiskLevelEnum
     platform_results: List[PlatformAlertResult]
@@ -91,6 +106,7 @@ class AlertListResponse(BaseModel):
 
 class FeedbackRequest(BaseModel):
     analysis_id: str = Field(description="ID returned by /analyse.")
+    session_id: Optional[str] = Field(None, description="Session ID from the original /analyse call, required to track overrides per conversation.")
     action: FeedbackActionEnum
     notes: Optional[str] = Field(
         None,
@@ -110,6 +126,29 @@ class FeedbackResponse(BaseModel):
     action: FeedbackActionEnum
     outcome: str = Field(description="What the system did in response to this feedback.")
     recorded_at: datetime
+
+
+class EscalationRecord(BaseModel):
+    escalation_id: str
+    session_id: str
+    analysis_id: str
+    risk_score: int
+    reason: str
+    status: EscalationStatusEnum
+    resolution: Optional[EscalationResolutionEnum] = None
+    resolution_notes: Optional[str] = None
+    created_at: datetime
+    resolved_at: Optional[datetime] = None
+
+
+class EscalationListResponse(BaseModel):
+    total: int
+    escalations: List[EscalationRecord]
+
+
+class EscalationResolveRequest(BaseModel):
+    resolution: EscalationResolutionEnum
+    notes: Optional[str] = Field(None, max_length=1000)
 
 class HealthResponse(BaseModel):
     status: str
