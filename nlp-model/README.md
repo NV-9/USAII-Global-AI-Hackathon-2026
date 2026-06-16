@@ -16,25 +16,32 @@ uses to trigger cross-platform alerts.
 
 | Metric | Score |
 |---|---|
-| Overall Accuracy | 99% |
-| Scam Precision | 91% |
-| Scam Recall | 98% |
-| F1 Score | 95% |
-| False Negative Rate | 1.9% |
+| Overall Accuracy | 98% |
+| Scam Precision | 94% |
+| Scam Recall | 97% |
+| F1 Score | 96% |
+| False Negative Rate | 2.8% |
 
-The model was trained on 8,272 messages and tested on 2,068 messages.
+The model was trained on 11,407 messages and tested on 2,282 messages.
 
 ---
 
 ## How It Works
 
 ### Step 1 — Data
-The model was trained on two combined datasets:
+The model was trained on three combined datasets:
 - UCI SMS Spam Collection (5,572 messages)
 - Kaggle Scam Detection Dataset (5,574 messages)
+- Synthetic Scam Dataset — Team Generated (1,300 messages)
+
+The synthetic dataset was created specifically to address modern digital 
+exploitation patterns that are underrepresented in public datasets, including 
+social media impersonation, crypto investment scams, romance scams, fake 
+emergency scams, and phishing messages. All synthetic data is disclosed 
+transparently as team-generated.
 
 After cleaning and removing duplicates, the final dataset contains 
-10,340 messages — 9,034 legitimate and 1,306 scam messages.
+11,407 messages — 9,122 legitimate and 2,285 scam messages.
 
 ### Step 2 — Feature Extraction
 The model uses two types of features:
@@ -66,18 +73,18 @@ The model outputs a structured risk assessment:
 
 ```json
 {
-  "risk_score": 96,
+  "risk_score": 97,
   "risk_level": "High",
-  "confidence": 0.96,
-  "triggered_features": ["urgency", "pressure_tactics", "money_request"],
+  "confidence": 0.98,
+  "triggered_features": ["urgency", "money_request", "secrecy_tactics"],
   "requires_human_review": true
 }
 ```
 
 **Risk Levels:**
--  Low — risk score 0–39 — message appears legitimate
--  Medium — risk score 40–69 — suspicious, requires human review
--  High — risk score 70–100 — high probability of exploitation attempt
+- Low — risk score 0–39 — message appears legitimate
+- Medium — risk score 40–69 — suspicious, requires human review
+- High — risk score 70–100 — high probability of exploitation attempt
 
 ---
 
@@ -94,6 +101,85 @@ behavioural patterns rather than fixed rules.
 
 ---
 
+## Example Outputs
+
+**Example 1 — High Risk Scam:**
+```python
+analyse_message("URGENT! Send money now to my account. Trust me don't worry. Limited time offer!")
+# Output:
+# {
+#   "risk_score": 99,
+#   "risk_level": "High",
+#   "confidence": 1.0,
+#   "triggered_features": ["urgency", "pressure_tactics", "money_request"],
+#   "requires_human_review": True
+# }
+```
+
+**Example 2 — Legitimate Message:**
+```python
+analyse_message("Hey, are we still meeting for lunch tomorrow?")
+# Output:
+# {
+#   "risk_score": 1,
+#   "risk_level": "Low",
+#   "confidence": 0.01,
+#   "triggered_features": [],
+#   "requires_human_review": False
+# }
+```
+
+**Example 3 — Social Media Impersonation:**
+```python
+analyse_message("Hi it's me, I need you to transfer money urgently to this account, don't tell anyone please")
+# Output:
+# {
+#   "risk_score": 97,
+#   "risk_level": "High",
+#   "confidence": 0.98,
+#   "triggered_features": ["urgency", "money_request", "secrecy_tactics"],
+#   "requires_human_review": True
+# }
+```
+
+**Example 4 — Crypto Investment Scam:**
+```python
+analyse_message("I made £500 in one day on this platform, you only need to invest £200 to start, DM me for the link")
+# Output:
+# {
+#   "risk_score": 78,
+#   "risk_level": "High",
+#   "confidence": 0.79,
+#   "triggered_features": ["money_request"],
+#   "requires_human_review": True
+# }
+```
+
+**Example 5 — Romance Scam:**
+```python
+analyse_message("My darling I need your help, I am stuck at customs and need £300 for fees, please send urgently, don't tell anyone")
+# Output:
+# {
+#   "risk_score": 99,
+#   "risk_level": "High",
+#   "confidence": 0.99,
+#   "triggered_features": ["urgency", "secrecy_tactics"],
+#   "requires_human_review": True
+# }
+```
+
+---
+
+## Data Sources
+
+| Dataset | Source | Why It's Useful |
+|---|---|---|
+| UCI SMS Spam Collection | archive.ics.uci.edu/dataset/228 | Labelled spam/scam messages for NLP training |
+| Kaggle Scam Detection Dataset | kaggle.com/datasets/noorsaeed/scam-detection-dataset | Scam-specific patterns |
+| Synthetic Scam Dataset | Team generated | Modern digital exploitation patterns — social media impersonation, crypto scams, romance scams, fake emergencies, phishing |
+
+---
+
 ## Files
 
 | File | Description |
@@ -104,6 +190,7 @@ behavioural patterns rather than fixed rules.
 | requirements.txt | Python libraries required |
 | spam.csv | UCI SMS Spam Collection dataset |
 | SMS Spam Dataset.csv | Kaggle Scam Detection dataset |
+| synthetic_scam_data.csv | Team-generated synthetic scam conversations |
 | README.md | This file |
 
 ---
@@ -151,51 +238,8 @@ with open('tfidf_vectorizer.pkl', 'rb') as f:
     tfidf = pickle.load(f)
 
 # Use the analyse_message function from the notebook
-result = analyse_message("Send me money urgently, trust me don't tell anyone")
+result = analyse_message("Hi it's me, I need you to transfer money urgently, don't tell anyone please")
 print(result)
-```
-
----
-
-## Example Outputs
-
-**Example 1 — High Risk Scam:**
-```python
-analyse_message("URGENT! Send money now to my account. Trust me don't worry. Limited time!")
-# Output:
-# {
-#   "risk_score": 96,
-#   "risk_level": "High", 
-#   "confidence": 0.96,
-#   "triggered_features": ["urgency", "pressure_tactics", "money_request"],
-#   "requires_human_review": True
-# }
-```
-
-**Example 2 — Legitimate Message:**
-```python
-analyse_message("Hey, are we still meeting for lunch tomorrow?")
-# Output:
-# {
-#   "risk_score": 2,
-#   "risk_level": "Low",
-#   "confidence": 0.02,
-#   "triggered_features": [],
-#   "requires_human_review": False
-# }
-```
-
-**Example 3 — Social Media Impersonation:**
-```python
-analyse_message("Hi it's me, transfer money urgently, don't tell anyone please")
-# Output:
-# {
-#   "risk_score": 64,
-#   "risk_level": "Medium",
-#   "confidence": 0.65,
-#   "triggered_features": ["urgency", "money_request", "secrecy_tactics"],
-#   "requires_human_review": True
-# }
 ```
 
 ---
@@ -226,7 +270,23 @@ POST /analyse
 
 ---
 
+## Responsible AI & Data Disclosure
+
+**Synthetic Data:** 1,300 messages in the training dataset were synthetically 
+generated by the team. This was done to address the lack of publicly available 
+modern digital exploitation datasets covering social media impersonation, 
+crypto scams, and romance scams. All synthetic data is clearly labelled and 
+disclosed transparently.
+
+**Privacy:** The model analyses message content in real time and never stores 
+message text. Only the risk score and triggered features are retained.
+
+**Human in the Loop:** The model never makes autonomous decisions. All 
+high-risk and medium-risk flags require human review before any action is taken.
+
+---
+
 ## Built By
-Sukhnaaz Kaur 
+Sukhnaaz Kaur
 
 Team Ctrl Alt Elite — USAII Global AI Hackathon 2026
