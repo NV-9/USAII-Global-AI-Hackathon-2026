@@ -26,12 +26,18 @@ _OUTCOMES = {
         "A trained operator will assess the evidence and decide on further action. "
         "Payment remains blocked pending human decision."
     ),
+    FeedbackActionEnum.OVERRIDE: (
+        "User chose to proceed despite the scam warning. "
+        "This override has been logged against the conversation and counts toward "
+        "automatic escalation to a human fraud analyst if risk continues to climb."
+    ),
 }
 
 
 async def record_feedback(
     analysis_id: str,
     action: FeedbackActionEnum,
+    session_id: Optional[str] = None,
     notes: Optional[str] = None,
 ) -> FeedbackResponse:
     feedback_id = str(uuid.uuid4())
@@ -42,11 +48,12 @@ async def record_feedback(
     async with pool.acquire() as conn:
         await conn.execute(
             """
-            INSERT INTO feedback (feedback_id, analysis_id, action, outcome, notes, recorded_at)
-            VALUES ($1, $2, $3, $4, $5, $6)
+            INSERT INTO feedback (feedback_id, analysis_id, session_id, action, outcome, notes, recorded_at)
+            VALUES ($1, $2, $3, $4, $5, $6, $7)
             """,
             feedback_id,
             analysis_id,
+            session_id,
             action.value,
             outcome,
             notes,

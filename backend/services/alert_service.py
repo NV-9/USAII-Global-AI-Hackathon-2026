@@ -83,6 +83,7 @@ async def broadcast_alert(
     analysis_id: str,
     risk_score: int,
     risk_level: str,
+    session_id: Optional[str] = None,
     simulate: bool = True,
 ) -> AlertRecord:
     alert_id = str(uuid.uuid4())
@@ -122,6 +123,7 @@ async def broadcast_alert(
     record = AlertRecord(
         alert_id=alert_id,
         analysis_id=analysis_id,
+        session_id=session_id,
         risk_score=risk_score,
         risk_level=RiskLevelEnum(risk_level),
         platform_results=list(results),
@@ -135,12 +137,13 @@ async def broadcast_alert(
         await conn.execute(
             """
             INSERT INTO alerts
-                (alert_id, analysis_id, risk_score, risk_level,
+                (alert_id, analysis_id, session_id, risk_score, risk_level,
                  platform_results, total_platforms, successful_alerts, created_at)
-            VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+            VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
             """,
             record.alert_id,
             record.analysis_id,
+            record.session_id,
             record.risk_score,
             record.risk_level.value,
             [r.model_dump(mode="json") for r in record.platform_results],
@@ -179,6 +182,7 @@ def _row_to_alert(row) -> AlertRecord:
     return AlertRecord(
         alert_id=row["alert_id"],
         analysis_id=row["analysis_id"],
+        session_id=row["session_id"],
         risk_score=row["risk_score"],
         risk_level=RiskLevelEnum(row["risk_level"]),
         platform_results=platform_results,
