@@ -1,0 +1,4 @@
+test_id,date_tested,tester,endpoint_or_screen,actual_risk_score,actual_risk_level,actual_triggered_features,actual_alert_triggered,actual_human_review,feedback_action_used,screenshot_or_recording_file,pass_fail,issue_found,notes
+TC031,18/06/2026,Emmanuel,/analyse,22,LOW,"Urgency language detected",False,True,None,None,FAIL,"False negative: high-risk scam message was classified as LOW and did not trigger alert","Message contained money request, secrecy, warning-bypass, and impersonation cues but only urgency was detected."
+TC031,18/06/2026,Emmanuel,/analyse,99,HIGH,"Urgency language detected; Pressure / coercion phrases detected; Money transfer request detected; Secrecy / isolation tactics detected",True,True,None,None,PASS,"None","High-risk scam message correctly triggered alert and human review."
+
