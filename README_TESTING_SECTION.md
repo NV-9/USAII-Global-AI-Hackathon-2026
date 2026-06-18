@@ -1,6 +1,6 @@
 # Testing & Evaluation
 
-The Person 4 testing work focused on verifying the full decision-support workflow: message signal → NLP risk insight → alert decision → human action → feedback.
+The testing work focused on verifying the full decision-support workflow: message signal → NLP risk insight → alert decision → human action → feedback.
 
 ## Test dataset
 
