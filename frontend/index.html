@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ScamShield AI</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;700&display=swap"
+    rel="stylesheet"
+  >
+
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <nav>
+    <div class="logo">
+      <div class="logo-icon">🛡️</div>
+      ScamShield AI
+    </div>
+  </nav>
+
+  <main>
+
+    <section class="card">
+
+      <h1>Analyse Message</h1>
+
+      <p class="subtitle">
+        Paste a suspicious message to check for scam indicators.
+      </p>
+
+      <textarea
+        id="msgInput"
+        placeholder="Paste suspicious message here..."
+      ></textarea>
+
+      <button
+        class="analyse-btn"
+        onclick="analyseMessage()"
+      >
+        Analyse Message
+      </button>
+
+      <div
+        class="result"
+        id="result"
+        style="display:none;"
+      >
+
+        <div class="result-header">
+
+          <span class="risk-badge" id="riskLabel">
+            HIGH RISK
+          </span>
+
+          <span class="risk-score" id="riskScore">
+            Score: 0/100
+          </span>
+
+        </div>
+
+        <h3>Why was this flagged?</h3>
+        <p id="resultWhy"></p>
+        <div
+          class="result-tags"
+          id="resultTags"
+        ></div>
+        <div
+          id="decisionPanel"
+          style="display:none;"
+        >
+          <div class="cooling-banner">
+            Please take a moment before continuing.
+            Time remaining:
+            <span id="coolingTimer">30</span>s
+          </div>
+          <div class="override-row">
+            <button
+              class="btn-override btn-dismiss"
+              onclick="cancelAction()"
+            >
+              Cancel
+            </button>
+            <button
+              class="btn-override btn-confirm"
+              id="proceedBtn"
+              disabled
+              onclick="proceedAnyway()"
+            >
+              Proceed Anyway
+          </button>
+          </div>
+        </div>
+        <div
+          id="escalationPanel"
+          style="display:none;"
+        >
+          <h3>🚨 Payment Blocked</h3>
+          <p>
+            This transaction has been escalated to a fraud analyst
+            for manual review.
+          </p>
+          <p>
+            Reference Number:
+            <strong id="referenceNumber"></strong>
+          </p>
+
+        </div>
+        </div>
+    </section>
+    <section class="card alerts-card">
+
+      <h2>Recent Alerts</h2>
+
+      <p class="subtitle">
+        High-risk scam alerts sent to connected platforms.
+      </p>
+
+      <div id="alertsList">
+        Loading alerts...
+      </div>
+
+    </section>
+
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>
