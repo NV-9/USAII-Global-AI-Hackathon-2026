@@ -194,7 +194,42 @@ The remaining model files (`config.json`, tokenizer files, `vocab.txt`) are alre
 **Privacy:** Message content is never stored. Only the mathematical risk score and triggered feature labels are retained and broadcast. Users provide explicit informed consent before the system activates.
 
 ---
+## Frontend
 
+### Features
+
+- Paste and analyse suspicious messages
+- AI-generated scam risk scoring
+- Risk classification (Low, Medium, High)
+- Scam indicator explanations
+- Cooling-off timer for suspicious activity
+- User decision workflow (Cancel or Proceed Anyway)
+- Fraud analyst escalation workflow
+- Recent alerts dashboard
+- Responsive dark-themed interface
+
+### Technologies
+
+- HTML5
+- CSS3
+- Vanilla JavaScript
+
+### User Flow
+
+1. Paste a suspicious message.
+2. Click **Analyse Message**.
+3. Review the risk score and explanation.
+4. Complete the cooling-off period for Medium and High risk cases.
+5. Choose to cancel the action or proceed despite the warning.
+6. High-risk cases can be escalated to a human fraud analyst for review.
+
+####Screens
+
+- Message Analysis Screen
+- Risk Assessment Results
+- Cooling-Off Decision Panel
+- Fraud Analyst Escalation Screen
+- Recent Alerts Dashboard
 ## Testing & Evaluation
 
 The testing work focused on verifying the full decision-support workflow: message signal → NLP risk insight → alert decision → human action → feedback.
