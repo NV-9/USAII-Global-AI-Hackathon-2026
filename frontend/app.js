@@ -49,16 +49,8 @@ async function analyseMessage() {
         document.getElementById("decisionPanel").style.display = "none";
         document.getElementById("escalationPanel").style.display = "none";
 
-        if (data.risk_score > 90) {
-
-            document.getElementById("escalationPanel").style.display =
-                "block";
-
-            document.getElementById("referenceNumber").textContent =
-                crypto.randomUUID()
-                    .substring(0, 8)
-                    .toUpperCase();
-
+        if (data.escalation_triggered) {
+            showEscalationPanel();
         }
         if (data.risk_level !== "LOW") {
     startCoolingTimer(30);
@@ -70,24 +62,6 @@ async function analyseMessage() {
     }
 }
 
-
-async function dismissAlert() {
-    if (!currentAnalysisId) return;
-
-    await fetch(`${API_BASE}/feedback`, {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-            analysis_id: currentAnalysisId,
-            session_id: sessionId,
-            action: "dismiss"
-        })
-    });
-
-    document.getElementById("result").style.display = "none";
-}
 
 async function loadAlerts() {
     try {
@@ -143,11 +117,58 @@ function startCoolingTimer(seconds = 30) {
     }, 1000);
 }
 
-function cancelAction() {
-    alert("Action cancelled.");
+async function cancelAction() {
+    if (!currentAnalysisId) return;
+
+    try {
+        await fetch(`${API_BASE}/feedback`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                analysis_id: currentAnalysisId,
+                session_id: sessionId,
+                action: "dismiss"
+            })
+        });
+
+        document.getElementById("result").style.display = "none";
+
+    } catch (err) {
+        console.error(err);
+        alert("Failed to submit cancellation.");
+    }
 }
 
-function proceedAnyway() {
-    alert("Proceeding despite warning.");
+async function proceedAnyway() {
+    if (!currentAnalysisId) return;
+
+    try {
+        const response = await fetch(`${API_BASE}/feedback`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                analysis_id: currentAnalysisId,
+                session_id: sessionId,
+                action: "override"x
+            })
+        });
+
+        if (response.status === 403) {
+            alert(
+                "This payment has been escalated to a fraud analyst and cannot be overridden."
+            );
+            return;
+        }
+
+        alert("User chose to proceed despite the warning.");
+
+    } catch (err) {
+        console.error(err);
+        alert("Failed to submit override.");
+    }
 }
 document.addEventListener("DOMContentLoaded", loadAlerts);
