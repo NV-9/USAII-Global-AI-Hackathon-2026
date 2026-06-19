@@ -254,7 +254,7 @@ textarea:focus {
 
 .alert-item {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   gap: 12px;
 
   padding: 14px 0;
@@ -266,10 +266,28 @@ textarea:focus {
   border-bottom: none;
 }
 
+.alert-item .alert-dot {
+  margin-top: 6px;
+}
+
+.alert-item-body {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  flex: 1;
+}
+
+.alert-categories {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
 .alert-timestamp {
   margin-left: auto;
   color: var(--muted);
   font-size: 13px;
+  white-space: nowrap;
 }
 
 .alert-dot {

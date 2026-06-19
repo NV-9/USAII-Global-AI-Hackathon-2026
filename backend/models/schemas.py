@@ -94,6 +94,7 @@ class AlertRecord(BaseModel):
     session_id: Optional[str] = None
     risk_score: int
     risk_level: RiskLevelEnum
+    triggered_features: List[str] = Field(default_factory=list)
     platform_results: List[PlatformAlertResult]
     total_platforms: int
     successful_alerts: int

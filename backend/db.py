@@ -44,6 +44,7 @@ CREATE TABLE IF NOT EXISTS feedback (
 
 ALTER TABLE alerts   ADD COLUMN IF NOT EXISTS session_id TEXT;
 ALTER TABLE feedback ADD COLUMN IF NOT EXISTS session_id TEXT;
+ALTER TABLE alerts   ADD COLUMN IF NOT EXISTS triggered_features JSONB NOT NULL DEFAULT '[]';
 
 CREATE INDEX IF NOT EXISTS idx_alerts_created_at   ON alerts(created_at DESC);
 CREATE INDEX IF NOT EXISTS idx_alerts_analysis_id  ON alerts(analysis_id);

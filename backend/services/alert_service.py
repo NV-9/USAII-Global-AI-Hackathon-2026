@@ -84,8 +84,10 @@ async def broadcast_alert(
     risk_score: int,
     risk_level: str,
     session_id: Optional[str] = None,
+    triggered_features: Optional[List[str]] = None,
     simulate: bool = True,
 ) -> AlertRecord:
+    triggered_features = triggered_features or []
     alert_id = str(uuid.uuid4())
     sent_at = datetime.now(timezone.utc)
 
@@ -126,6 +128,7 @@ async def broadcast_alert(
         session_id=session_id,
         risk_score=risk_score,
         risk_level=RiskLevelEnum(risk_level),
+        triggered_features=triggered_features,
         platform_results=list(results),
         total_platforms=len(PLATFORM_WEBHOOKS),
         successful_alerts=successful,
@@ -138,14 +141,15 @@ async def broadcast_alert(
             """
             INSERT INTO alerts
                 (alert_id, analysis_id, session_id, risk_score, risk_level,
-                 platform_results, total_platforms, successful_alerts, created_at)
-            VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+                 triggered_features, platform_results, total_platforms, successful_alerts, created_at)
+            VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
             """,
             record.alert_id,
             record.analysis_id,
             record.session_id,
             record.risk_score,
             record.risk_level.value,
+            record.triggered_features,
             [r.model_dump(mode="json") for r in record.platform_results],
             record.total_platforms,
             record.successful_alerts,
@@ -192,6 +196,7 @@ def _row_to_alert(row) -> AlertRecord:
         session_id=row["session_id"],
         risk_score=row["risk_score"],
         risk_level=RiskLevelEnum(row["risk_level"]),
+        triggered_features=row["triggered_features"] or [],
         platform_results=platform_results,
         total_platforms=row["total_platforms"],
         successful_alerts=row["successful_alerts"],

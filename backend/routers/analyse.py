@@ -39,6 +39,7 @@ async def analyse(request: AnalyseRequest) -> AnalyseResponse:
             risk_score=result["risk_score"],
             risk_level=result["risk_level"],
             session_id=request.session_id,
+            triggered_features=result["triggered_features"],
             simulate=True,  # set False in production with real webhook URLs
         )
         alert_triggered = True

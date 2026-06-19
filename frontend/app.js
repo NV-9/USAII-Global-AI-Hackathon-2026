@@ -79,10 +79,13 @@ async function loadAlerts() {
         container.innerHTML = data.alerts.map(alert => `
             <div class="alert-item">
                 <div class="alert-dot ${alert.risk_level.toLowerCase()}"></div>
-                <span>
-                    ${alert.risk_level} Risk
-                    (Score: ${alert.risk_score})
-                </span>
+                <div class="alert-item-body">
+                    <span>
+                        ${alert.risk_level} Risk
+                        (Score: ${alert.risk_score})
+                    </span>
+                    ${renderFeatureTags(alert.triggered_features)}
+                </div>
             </div>
         `).join("");
 
@@ -92,6 +95,15 @@ async function loadAlerts() {
 }
 let allAlertsPage = 1;
 const ALL_ALERTS_PAGE_SIZE = 10;
+
+function renderFeatureTags(features) {
+    if (!features || features.length === 0) return "";
+    return `
+        <div class="alert-categories">
+            ${features.map(f => `<span class="tag">${f.replace(/_/g, " ")}</span>`).join("")}
+        </div>
+    `;
+}
 
 function formatAlertTimestamp(isoString) {
     if (!isoString) return "";
@@ -117,10 +129,13 @@ async function loadAllAlerts(page = 1) {
             container.innerHTML = data.alerts.map(alert => `
                 <div class="alert-item">
                     <div class="alert-dot ${alert.risk_level.toLowerCase()}"></div>
-                    <span>
-                        ${alert.risk_level} Risk
-                        (Score: ${alert.risk_score})
-                    </span>
+                    <div class="alert-item-body">
+                        <span>
+                            ${alert.risk_level} Risk
+                            (Score: ${alert.risk_score})
+                        </span>
+                        ${renderFeatureTags(alert.triggered_features)}
+                    </div>
                     <span class="alert-timestamp">${formatAlertTimestamp(alert.created_at)}</span>
                 </div>
             `).join("");

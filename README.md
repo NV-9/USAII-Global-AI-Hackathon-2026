@@ -190,6 +190,59 @@ The remaining model files (`config.json`, tokenizer files, `vocab.txt`) are alre
 
 ---
 
+## Deployment
+
+The entire system runs locally via Docker Compose — no cloud account is required for the prototype.
+
+### Prerequisites
+
+- Docker and Docker Compose
+- [`model.safetensors`](#download-the-model) downloaded into `nlp-model/scamshield_bert_model/`
+
+### Run it
+
+```bash
+docker compose up --build
+```
+
+This builds and starts four containers in dependency order, gated by healthchecks: `db` (Postgres) → `nlp` (BERT model service) → `api` (FastAPI backend) → `frontend` (static nginx). On first boot, the backend automatically creates its Postgres schema (`alerts`, `feedback`, `escalations` tables) — no separate migration step is needed.
+
+| Service | URL |
+|---|---|
+| Frontend | http://localhost:3000 |
+| Backend API + docs | http://localhost:8000/docs |
+| NLP service | http://localhost:8001 |
+
+### Picking up code changes
+
+- **`frontend/`** is bind-mounted read-only into the nginx container, so HTML/CSS/JS edits appear on refresh with no rebuild.
+- **`backend/`** and **`nlp-model/`** are baked into their images at build time. After editing either, rebuild and restart just that service:
+  ```bash
+  docker compose up -d --build api
+  docker compose up -d --build nlp
+  ```
+
+### Configuration
+
+The backend reads two environment variables, both already set for the Compose network in `docker-compose.yml`:
+
+| Variable | Default (local) | Purpose |
+|---|---|---|
+| `DATABASE_URL` | `postgresql://scamshield:scamshield@db:5432/scamshield` | Postgres connection string |
+| `NLP_SERVICE_URL` | `http://nlp:8001` | Where the backend calls for risk scoring |
+
+Risk thresholds, fraud-analyst escalation rules, and the simulated payment-platform webhook list live in `backend/config.py`. Platform webhooks default to a local stub (`http://localhost:9001/webhook/...`) and alert dispatch runs in `simulate=True` mode — point `PLATFORM_WEBHOOKS` at real endpoints and flip `simulate` in `routers/analyse.py` to broadcast live.
+
+### Resetting local data
+
+```bash
+docker compose down -v
+```
+
+Drops the named Postgres volume (`scamshield_postgres_data`), wiping all alerts/feedback/escalations history. Omit `-v` to keep data across restarts.
+
+---
+
 ## Responsible AI & Ethical Tradeoffs
 
 **False Positives:** Misidentifying a legitimate transfer creates friction and erodes user trust. Mitigation: The system uses a three-tier approach rather than binary blocking. Medium risk cases show a soft warning the user can immediately override. High risk cases enforce a brief cooling-off period. Only escalated cases (High risk + isolation tactics detected) are blocked pending analyst review. All alerts include plain-language explanations of what was detected.
