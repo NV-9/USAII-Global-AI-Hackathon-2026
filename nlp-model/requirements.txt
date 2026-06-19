@@ -4,3 +4,6 @@ numpy
 matplotlib
 seaborn
 jupyter
+transformers
+torch
+scipy
