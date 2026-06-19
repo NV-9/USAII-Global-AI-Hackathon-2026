@@ -1,4 +1,4 @@
-"""FastAPI wrapper around the fine-tuned ScamShield BERT model."""
+"""FastAPI wrapper around the fine-tuned ThinkAgainAI BERT model."""
 
 from __future__ import annotations
 
@@ -27,7 +27,7 @@ async def lifespan(app: FastAPI):
     yield
 
 
-app = FastAPI(title="ScamShield NLP Service", lifespan=lifespan)
+app = FastAPI(title="ThinkAgainAI NLP Service", lifespan=lifespan)
 
 
 def _count_urgency(text: str) -> int:

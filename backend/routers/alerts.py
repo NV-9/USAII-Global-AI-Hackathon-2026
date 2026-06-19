@@ -5,6 +5,9 @@ GET /alerts/{id}   — Retrieve a specific alert record.
 
 from __future__ import annotations
 
+import math
+from typing import Optional
+
 from fastapi import APIRouter, HTTPException, Query, status
 
 from models.schemas import AlertListResponse, AlertRecord
@@ -18,15 +21,34 @@ router = APIRouter(prefix="/alerts", tags=["Alerts"])
     response_model=AlertListResponse,
     summary="List recent alert broadcasts",
     description=(
-        "Returns the most recent alert records (up to `limit`, default 50). "
+        "Returns a page of recent alert records, most recent first. "
         "Each record shows which platforms were alerted and whether each call succeeded."
     ),
 )
 async def list_alerts(
-    limit: int = Query(default=50, ge=1, le=200, description="Maximum number of records to return"),
+    page: int = Query(default=1, ge=1, description="1-indexed page number"),
+    page_size: int = Query(default=10, ge=1, le=200, description="Number of records per page"),
+    limit: Optional[int] = Query(
+        default=None, ge=1, le=200,
+        description="Legacy parameter, equivalent to page_size with page=1.",
+    ),
 ) -> AlertListResponse:
-    alerts = await alert_service.get_recent_alerts(limit=limit)
-    return AlertListResponse(total=len(alerts), alerts=alerts)
+    if limit is not None:
+        page_size = limit
+        page = 1
+
+    total = await alert_service.count_alerts()
+    offset = (page - 1) * page_size
+    alerts = await alert_service.get_recent_alerts(limit=page_size, offset=offset)
+    total_pages = max(1, math.ceil(total / page_size))
+
+    return AlertListResponse(
+        total=total,
+        page=page,
+        page_size=page_size,
+        total_pages=total_pages,
+        alerts=alerts,
+    )
 
 
 @router.get(

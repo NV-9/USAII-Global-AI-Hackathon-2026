@@ -155,14 +155,21 @@ async def broadcast_alert(
     return record
 
 
-async def get_recent_alerts(limit: int = 50) -> List[AlertRecord]:
+async def get_recent_alerts(limit: int = 50, offset: int = 0) -> List[AlertRecord]:
     pool = get_pool()
     async with pool.acquire() as conn:
         rows = await conn.fetch(
-            "SELECT * FROM alerts ORDER BY created_at DESC LIMIT $1",
+            "SELECT * FROM alerts ORDER BY created_at DESC LIMIT $1 OFFSET $2",
             limit,
+            offset,
         )
     return [_row_to_alert(r) for r in rows]
+
+
+async def count_alerts() -> int:
+    pool = get_pool()
+    async with pool.acquire() as conn:
+        return await conn.fetchval("SELECT COUNT(*) FROM alerts")
 
 
 async def get_alert_by_id(alert_id: str) -> Optional[AlertRecord]:

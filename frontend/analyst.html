@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <title>ScamShield AI - Analyst Dashboard</title>
+  <title>ThinkAgainAI - Analyst Dashboard</title>
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -19,17 +19,17 @@
 <body>
 
   <nav>
-    <div class="logo">
+    <a href="index.html" class="logo">
       <div class="logo-icon">🛡️</div>
-      ScamShield AI
-    </div>
+      ThinkAgainAI
+    </a>
     <div class="nav-links">
-      <a href="index.html" class="nav-link">← Analyse Messages</a>
+      <a href="index.html" class="nav-link">Analyse Messages</a>
       <a href="alerts.html" class="nav-link">Alerts</a>
     </div>
   </nav>
 
-  <main class="single-column">
+  <main>
 
     <section class="card">
 
@@ -37,6 +37,7 @@
 
       <p class="subtitle">
         Conversations escalated for manual review. Overrides are locked until an analyst resolves the case.
+        <b><i>Will usually be behind an authwall in production, but for this demo, it's open to the public.</i></b>
       </p>
 
       <div id="escalationsList">

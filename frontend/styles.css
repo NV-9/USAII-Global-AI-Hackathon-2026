@@ -22,11 +22,13 @@
   --red: #E74C3C;
 }
 
-body {
+html, body {
   font-family: "Inter", sans-serif;
   background: var(--bg);
   color: var(--text);
   min-height: 100vh;
+  overflow-x: hidden;
+  width: 100%;
 }
 
 nav {
@@ -51,6 +53,9 @@ nav {
   font-family: "Space Grotesk", sans-serif;
   font-size: 1.2rem;
   font-weight: 700;
+
+  color: var(--text);
+  text-decoration: none;
 }
 
 .logo-icon {
@@ -71,15 +76,22 @@ nav {
 }
 
 main {
-    max-width: 1400px;
+    max-width: 800px;
     margin: 40px auto;
     padding: 0 24px;
 
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+@media (min-width: 1024px) {
+  main.with-sidebar {
+    max-width: 1100px;
     display: grid;
     grid-template-columns: 2fr 1fr;
-    gap: 24px;
-
     align-items: start;
+  }
 }
 
 .card {
@@ -254,6 +266,12 @@ textarea:focus {
   border-bottom: none;
 }
 
+.alert-timestamp {
+  margin-left: auto;
+  color: var(--muted);
+  font-size: 13px;
+}
+
 .alert-dot {
   width: 10px;
   height: 10px;
@@ -270,6 +288,34 @@ textarea:focus {
 
 .alert-dot.low {
   background: var(--green);
+}
+
+.pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid var(--border);
+}
+
+.pagination button {
+  flex: none;
+  padding: 8px 16px;
+  border: 1px solid var(--border);
+  background: var(--surface2);
+  color: var(--text);
+}
+
+.pagination button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.pagination span {
+  color: var(--muted);
+  font-size: 14px;
 }
 .cooling-banner {
   margin-top: 16px;
@@ -353,11 +399,6 @@ textarea:focus {
   transform: translateY(-1px);
 }
 
-main.single-column {
-  display: block;
-  max-width: 800px;
-}
-
 .escalation-item {
   padding: 18px 0;
   border-bottom: 1px solid var(--border);
@@ -378,4 +419,80 @@ main.single-column {
   color: var(--muted);
   font-size: 0.8rem;
   font-family: "Space Grotesk", sans-serif;
+}
+
+@media (max-width: 768px) {
+  nav {
+    padding: 16px 20px;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
+  .nav-links {
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+
+  main {
+    margin: 20px auto;
+    padding: 0 16px;
+    max-width: 100%;
+    gap: 16px;
+  }
+
+  .card {
+    padding: 20px;
+  }
+
+  .result-header {
+    flex-wrap: wrap;
+  }
+
+  .override-row {
+    flex-direction: column;
+  }
+
+  .escalation-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+  }
+
+  .alert-item {
+    flex-wrap: wrap;
+  }
+
+  .alert-timestamp {
+    margin-left: 0;
+    width: 100%;
+  }
+
+  .pagination {
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+}
+
+@media (max-width: 480px) {
+  .logo {
+    font-size: 1rem;
+  }
+
+  .nav-link {
+    font-size: 0.8rem;
+  }
+
+  .card {
+    padding: 16px;
+    border-radius: 10px;
+  }
+
+  textarea {
+    min-height: 120px;
+  }
+
+  .pagination button {
+    padding: 8px 12px;
+    font-size: 0.85rem;
+  }
 }

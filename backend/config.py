@@ -49,7 +49,7 @@ NLP_FEATURE_WEIGHTS = {
 
 MAX_RAW_SCORE = sum(NLP_FEATURE_WEIGHTS.values())
 
-APP_TITLE = "ScamShield Backend API"
+APP_TITLE = "ThinkAgainAI Backend API"
 APP_VERSION = "1.0.0"
 APP_DESCRIPTION = (
     "Receives messages, runs NLP scam detection, returns a risk score, "

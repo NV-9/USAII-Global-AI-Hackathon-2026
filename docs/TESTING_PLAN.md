@@ -1,11 +1,11 @@
-# ScamShield AI — Person 4 Testing Plan
+# ThinkAgainAI — Person 4 Testing Plan
 
 Owner: Emmanuel  
 Role: Data + Testing + Video
 
 ## Purpose
 
-This testing pack checks whether ScamShield AI can classify scam-like and safe financial conversations, explain the risk reason, trigger simulated cross-platform alerts for high-risk cases, and preserve human decision-making.
+This testing pack checks whether ThinkAgainAI can classify scam-like and safe financial conversations, explain the risk reason, trigger simulated cross-platform alerts for high-risk cases, and preserve human decision-making.
 
 The tests are built around the challenge requirement that the system should convert fragmented signals into explainable decision support for human operators, rather than acting as an autonomous surveillance or blocking system.
 

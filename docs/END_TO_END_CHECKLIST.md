@@ -1,4 +1,4 @@
-# ScamShield AI — End-to-End Testing Checklist
+# ThinkAgainAI — End-to-End Testing Checklist
 
 ## 1. Setup checks
 

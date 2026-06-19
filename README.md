@@ -1,8 +1,8 @@
 # USAII-Global-AI-Hackathon-2026 | Graduate Track | Direction A: Safe Passage
 
-ScamShield AI is an early-warning detection system designed for Trust & Safety teams and fraud analysts at financial institutions. It identifies digital exploitation, specifically financial coercion and impersonation scams, by analyzing cross-platform behavioral and linguistic signals.
+ThinkAgainAI is an early-warning detection system designed for Trust & Safety teams and fraud analysts at financial institutions. It identifies digital exploitation, specifically financial coercion and impersonation scams, by analyzing cross-platform behavioral and linguistic signals.
 
-Unlike traditional rule-based systems that scammers easily bypass by altering keywords, ScamShield AI utilizes advanced NLP to detect semantic intent, urgency, and manipulative pressure. It surfaces these insights into an explainable dashboard, empowering human analysts to make informed intervention decisions before funds are irrevocably lost.
+Unlike traditional rule-based systems that scammers easily bypass by altering keywords, ThinkAgainAI utilizes advanced NLP to detect semantic intent, urgency, and manipulative pressure. It surfaces these insights into an explainable dashboard, empowering human analysts to make informed intervention decisions before funds are irrevocably lost.
 
 ---
 
@@ -32,10 +32,14 @@ Our architecture bridges the gap between fragmented data and human intervention 
 4. **Decision Support Layer (UI):** Surfaces the risk level, triggered features, and recommended action to the Trust & Safety analyst dashboard
 5. **Human Action Layer:** All final decisions remain with humans, medium risk cases show a warning the user can override, high risk cases enforce a cooling-off period, and escalated cases are routed directly to a fraud analyst
 
-All four services (`db`, `nlp`, `api`, `frontend`) run via `docker-compose.yml`, with healthchecks gating startup order.
-- Frontend: http://localhost:3000
-- Backend API: http://localhost:8000
-- NLP Service: http://localhost:8001
+All four services run via `docker-compose.yml`, with healthchecks gating startup order so the API waits on Postgres and the frontend waits on a healthy API:
+
+| Service | Container | Local URL |
+|---|---|---|
+| Frontend | `frontend` | http://localhost:3000 |
+| Backend API | `api` | http://localhost:8000 |
+| NLP Service | `nlp` | http://localhost:8001 |
+| Database | `db` (Postgres) | internal only, port 5432 |
 
 ---
 
@@ -197,6 +201,51 @@ The remaining model files (`config.json`, tokenizer files, `vocab.txt`) are alre
 **Privacy:** Message content is never stored. Only the mathematical risk score and triggered feature labels are retained and broadcast. Users provide explicit informed consent before the system activates.
 
 ---
+
+## Backend
+
+**Stack:** FastAPI + asyncpg (raw SQL against Postgres, no ORM) + httpx for outbound platform webhooks.
+
+The backend is the decision-support and persistence layer: it scores incoming messages via the NLP service, fans out alerts to payment platforms, tracks fraud-analyst escalations, and persists everything in Postgres so the dashboard reflects real history rather than in-memory state.
+
+### Endpoints
+
+| Method | Path | Purpose |
+|---|---|---|
+| `POST` | `/analyse` | Scores a message, broadcasts a platform alert on HIGH/CRITICAL risk, and escalates to a fraud analyst if override-abuse patterns are detected |
+| `GET` | `/alerts` | Paginated list of alert broadcasts (`page`, `page_size`, plus a legacy `limit`) |
+| `GET` | `/alerts/{id}` | Retrieve a specific alert record |
+| `POST` | `/feedback` | Records a user/operator action: confirm, dismiss, escalate, or override |
+| `GET` | `/feedback` | List recent feedback entries |
+| `GET` | `/escalations` | List fraud-analyst escalations (pending by default) |
+| `GET` | `/escalations/{id}` | Retrieve a specific escalation |
+| `POST` | `/escalations/{id}/resolve` | Analyst confirms fraud or releases the conversation, unlocking overrides |
+| `GET` | `/health` | Service health, NLP backend status, uptime |
+
+Interactive API docs are served at `/docs` (Swagger) and `/redoc`.
+
+### Alert broadcasting
+
+On a HIGH or CRITICAL score, `/analyse` fans the alert out concurrently to every platform in `PLATFORM_WEBHOOKS` (PayPal, Venmo, Cash App, Revolut, Zelle, Wise) with a per-call and global timeout, then persists the result of every platform call — sent, failed, or simulated — to the `alerts` table.
+
+### Fraud-analyst escalation
+
+A conversation is escalated to a human analyst once its risk score exceeds a configured threshold **and** the same session has already attempted multiple overrides across multiple flagged messages — a single high-risk warning never auto-escalates. Once escalated, `is_session_locked` blocks further overrides on that session until an analyst calls `/escalations/{id}/resolve`.
+
+### Persistence
+
+Three Postgres tables, created on startup if missing, no migrations framework:
+
+| Table | Stores |
+|---|---|
+| `alerts` | Risk score, level, per-platform delivery results, session/analysis IDs |
+| `feedback` | User/operator actions (confirm, dismiss, escalate, override) per analysis |
+| `escalations` | Escalation reason, status, and analyst resolution |
+
+Message content itself is never persisted — only scores, feature labels, and outcomes.
+
+---
+
 ## Frontend
 
 ### Features
@@ -233,6 +282,9 @@ The remaining model files (`config.json`, tokenizer files, `vocab.txt`) are alre
 - Cooling-Off Decision Panel
 - Fraud Analyst Escalation Screen
 - Recent Alerts Dashboard
+
+---
+
 ## Testing & Evaluation
 
 The testing work focused on verifying the full decision-support workflow: message signal → NLP risk insight → alert decision → human action → feedback.

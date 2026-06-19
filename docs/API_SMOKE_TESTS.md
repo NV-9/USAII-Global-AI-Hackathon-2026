@@ -1,4 +1,4 @@
-# ScamShield AI — API Smoke Tests
+# ThinkAgainAI — API Smoke Tests
 
 Assumption: backend is running at `http://localhost:8000`.
 
