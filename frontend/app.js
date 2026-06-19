@@ -49,12 +49,11 @@ async function analyseMessage() {
         document.getElementById("decisionPanel").style.display = "none";
         document.getElementById("escalationPanel").style.display = "none";
 
-        if (data.escalation_triggered) {
-            showEscalationPanel();
+        if (data.escalation_triggered || data.override_locked) {
+            showEscalationPanel(data.escalation_id);
+        } else if (data.risk_level !== "LOW") {
+            startCoolingTimer(30);
         }
-        if (data.risk_level !== "LOW") {
-    startCoolingTimer(30);
-    }
         loadAlerts();
     } catch (err) {
         console.error(err);
@@ -64,11 +63,12 @@ async function analyseMessage() {
 
 
 async function loadAlerts() {
+    const container = document.getElementById("alertsList");
+    if (!container) return;
+
     try {
         const response = await fetch(`${API_BASE}/alerts?limit=5`);
         const data = await response.json();
-
-        const container = document.getElementById("alertsList");
 
         if (!data.alerts || data.alerts.length === 0) {
             container.innerHTML =
@@ -90,6 +90,16 @@ async function loadAlerts() {
         console.error(err);
     }
 }
+function showEscalationPanel(escalationId) {
+    document.getElementById("decisionPanel").style.display = "none";
+
+    const panel = document.getElementById("escalationPanel");
+    panel.style.display = "block";
+
+    document.getElementById("referenceNumber").textContent =
+        escalationId || "Pending";
+}
+
 function startCoolingTimer(seconds = 30) {
 
     const panel = document.getElementById("decisionPanel");
@@ -171,4 +181,67 @@ async function proceedAnyway() {
         alert("Failed to submit override.");
     }
 }
-document.addEventListener("DOMContentLoaded", loadAlerts);
+async function loadEscalations() {
+    const container = document.getElementById("escalationsList");
+    if (!container) return;
+
+    try {
+        const response = await fetch(`${API_BASE}/escalations?pending_only=true`);
+        const data = await response.json();
+
+        if (!data.escalations || data.escalations.length === 0) {
+            container.innerHTML = "<p>No pending escalations.</p>";
+            return;
+        }
+
+        container.innerHTML = data.escalations.map(esc => `
+            <div class="escalation-item" id="esc-${esc.escalation_id}">
+                <div class="escalation-row">
+                    <span class="risk-score">Score: ${esc.risk_score}/100</span>
+                    <span class="escalation-id">${esc.escalation_id}</span>
+                </div>
+                <p class="subtitle">${esc.reason}</p>
+                <div class="override-row">
+                    <button class="btn-override btn-confirm" onclick="resolveEscalation('${esc.escalation_id}', 'confirmed_fraud')">
+                        Confirm Fraud
+                    </button>
+                    <button class="btn-override btn-dismiss" onclick="resolveEscalation('${esc.escalation_id}', 'released')">
+                        Release (False Positive)
+                    </button>
+                </div>
+            </div>
+        `).join("");
+
+    } catch (err) {
+        console.error(err);
+        container.innerHTML = "<p>Failed to load escalations.</p>";
+    }
+}
+
+async function resolveEscalation(escalationId, resolution) {
+    try {
+        const response = await fetch(`${API_BASE}/escalations/${escalationId}/resolve`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ resolution })
+        });
+
+        if (!response.ok) {
+            alert("Failed to resolve escalation.");
+            return;
+        }
+
+        loadEscalations();
+
+    } catch (err) {
+        console.error(err);
+        alert("Failed to resolve escalation.");
+    }
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+    loadAlerts();
+    loadEscalations();
+});
