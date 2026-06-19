@@ -33,9 +33,9 @@ Our architecture bridges the gap between fragmented data and human intervention 
 5. **Human Action Layer:** All final decisions remain with humans, medium risk cases show a warning the user can override, high risk cases enforce a cooling-off period, and escalated cases are routed directly to a fraud analyst
 
 All four services (`db`, `nlp`, `api`, `frontend`) run via `docker-compose.yml`, with healthchecks gating startup order.
-Frontend: http://localhost:3000
-Backend API: http://localhost:8000
-NLP Service: http://localhost:8001
+- Frontend: http://localhost:3000
+- Backend API: http://localhost:8000
+- NLP Service: http://localhost:8001
 
 ---
 
