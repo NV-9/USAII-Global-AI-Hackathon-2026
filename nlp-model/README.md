@@ -1,14 +1,14 @@
-# ScamShield AI — NLP Model
+# ScamShield AI - NLP Model
 
 ## Overview
 This module contains the Natural Language Processing (NLP) model that forms 
 the core intelligence layer of ScamShield AI. It analyses text messages and 
 conversations to detect digital exploitation patterns including financial scams, 
-social media impersonation, and psychological manipulation tactics.
+social media impersonation, psychological manipulation tactics, and phishing attempts.
 
 The model takes a message as input and returns a risk score, risk level, 
-confidence score, and a list of triggered features — which the backend API 
-uses to trigger cross-platform alerts.
+confidence score, triggered features, and escalation flags, which the backend 
+API uses to trigger cross-platform alerts and human review workflows.
 
 ---
 
@@ -16,167 +16,201 @@ uses to trigger cross-platform alerts.
 
 | Metric | Score |
 |---|---|
-| Overall Accuracy | 98% |
-| Scam Precision | 94% |
-| Scam Recall | 97% |
-| F1 Score | 96% |
-| False Negative Rate | 2.8% |
+| Overall Accuracy | 96% (local CPU) / 100% (GPU) |
+| Validation Accuracy | 99.9% |
+| Validation Precision | 100% |
+| Validation Recall | 99.7% |
+| F1 Score | 99.9% |
 
-The model was trained on 11,407 messages and tested on 2,282 messages.
+Evaluated on 50 diverse real-world scam messages covering 5 scam categories 
+and legitimate messages including tricky edge cases (money requests between 
+friends, casual urgent messages).
+
+---
+
+## Model Architecture
+
+The final model is a **fine-tuned BERT (bert-base-uncased)** classifier for 
+sequence classification with 2 output labels (legitimate / scam).
+
+BERT was chosen over TF-IDF + Logistic Regression because it understands 
+context and meaning rather than just word frequency. This allows it to detect 
+scams that deliberately avoid obvious trigger words, for example:
+
+- "omg it's me, I lost my phone, can you spot me fifty quid" : no keywords but clear impersonation pattern
+- "been quietly stacking gains on this platform, want the link" : no "invest" or "profit" but clear crypto scam
+- "so this is awkward but they won't release my car without payment" : no "urgent" but clear fake emergency
+
+TF-IDF missed these entirely. BERT catches them because it learned the 
+underlying conversational patterns of exploitation, not just the vocabulary.
+
+---
+
+## Development Journey
+
+We took an iterative approach to building this model:
+
+**Phase 1 - TF-IDF + Logistic Regression baseline**
+Built an initial model using TF-IDF vectorisation and Logistic Regression 
+trained on UCI SMS Spam Collection and Kaggle Scam Detection datasets. 
+Achieved 98% overall accuracy but struggled with modern scam patterns,
+particularly social media impersonation and indirect romance scams that 
+avoid obvious keywords.
+
+**Phase 2 - Synthetic data generation**
+Identified that both datasets were SMS spam collections from 2011 that 
+lacked modern digital exploitation patterns. Generated 2,700 synthetic scam 
+conversations across 5 categories with structural variety — different tones, 
+sentence structures, and phrasing styles, specifically including examples 
+that avoid trigger keywords to force the model to learn deeper patterns.
+
+**Phase 3 - Switch to BERT**
+Fine-tuned bert-base-uncased on the cleaned dataset using a Tesla T4 GPU. 
+Through rigorous testing on 50 diverse messages, BERT demonstrated 
+significantly stronger generalisation than TF-IDF, particularly on casual 
+impersonation, indirect romance scams, and crypto scams without obvious 
+financial keywords.
+
+**Phase 4 - Data cleaning**
+Identified that mixing heterogeneous datasets (generic SMS spam + financial 
+exploitation scams) caused inconsistent label mapping. Resolved by training 
+exclusively on synthetic scam data plus clean legitimate messages, producing 
+a consistent and reliable model.
+
+This iterative process : building, testing, identifying weaknesses, and 
+improving, is documented transparently as part of our responsible AI approach.
+
+---
+
+## Training Data
+
+| Dataset | Messages | Purpose |
+|---|---|---|
+| Synthetic Scam Dataset v1 | 1,300 (1,000 scam / 300 legit) | Initial modern scam patterns |
+| Synthetic Scam Dataset v2 | 1,400 (1,100 scam / 300 legit) | Diverse phrasing, avoids keyword reliance |
+| UCI SMS Ham Messages | 4,690 legitimate messages | Clean legitimate baseline |
+| **Total** | **6,438 messages** | **1,748 scam / 4,690 legitimate** |
+
+All synthetic data was team-generated and is fully disclosed. Both synthetic 
+dataset files are included in this repository.
 
 ---
 
 ## How It Works
 
-### Step 1 — Data
-The model was trained on three combined datasets:
-- UCI SMS Spam Collection (5,572 messages)
-- Kaggle Scam Detection Dataset (5,574 messages)
-- Synthetic Scam Dataset — Team Generated (1,300 messages)
+### Step 1 - Input
+A message string is passed to `analyse_message()`.
 
-The synthetic dataset was created specifically to address modern digital 
-exploitation patterns that are underrepresented in public datasets, including 
-social media impersonation, crypto investment scams, romance scams, fake 
-emergency scams, and phishing messages. All synthetic data is disclosed 
-transparently as team-generated.
+### Step 2 - BERT Classification
+The message is tokenised using BertTokenizer and passed through the 
+fine-tuned BERT model, which outputs a probability score for each class.
 
-After cleaning and removing duplicates, the final dataset contains 
-11,407 messages — 9,122 legitimate and 2,285 scam messages.
-
-### Step 2 — Feature Extraction
-The model uses two types of features:
-
-**TF-IDF Features (5,000 features)**
-Converts message text into numerical vectors based on word importance 
-across the entire dataset.
-
-**Custom Scam-Specific Features (7 features)**
-These are specifically designed to detect digital exploitation patterns:
+### Step 3 - Custom Feature Extraction (Explainability)
+Alongside the BERT prediction, custom keyword features are extracted to 
+provide explainable output, so users understand WHY a message was flagged:
 
 | Feature | What It Detects |
 |---|---|
-| urgency_count | Time pressure language ("do it now", "limited time") |
-| pressure_count | Reassurance tactics ("trust me", "don't worry") |
-| money_request_count | Financial requests ("send money", "transfer", "crypto") |
-| suspicious_links | URLs and suspicious links in messages |
-| secrecy_count | Isolation tactics ("don't tell anyone", "between us") |
-| message_length | Total character count of message |
-| word_count | Total word count of message |
+| urgency | Time pressure language ("do it now", "limited time") |
+| pressure_tactics | Reassurance under pressure ("trust me", "don't worry") |
+| money_request | Financial requests ("send money", "transfer", "crypto") |
+| suspicious_links | URLs and suspicious links |
+| secrecy_tactics | Isolation tactics ("don't tell anyone", "between us") |
+| suspicious_language_pattern | BERT detected scam pattern with no explicit keywords |
 
-### Step 3 — Model
-The classifier is a **Logistic Regression** model trained with 
-class_weight='balanced' to handle the imbalanced dataset (more legitimate 
-messages than scam messages).
+### Step 4 — Risk Scoring & Escalation
+Risk score is calculated from BERT's confidence probability:
 
-### Step 4 — Output
-The model outputs a structured risk assessment:
+| Risk Level | Score | Action |
+|---|---|---|
+| Low | 0–39 | Message appears legitimate : no action |
+| Medium | 40–69 | Suspicious : user warned, can override |
+| High | 70–89 | High risk : cooling off period before override |
+| Critical (escalate) | 90–100 + secrecy detected | Blocked : escalated to fraud analyst |
 
+### Step 5 — Output
 ```json
 {
   "risk_score": 97,
   "risk_level": "High",
   "confidence": 0.98,
   "triggered_features": ["urgency", "money_request", "secrecy_tactics"],
-  "requires_human_review": true
+  "requires_human_review": true,
+  "escalate_to_analyst": false
 }
 ```
-
-**Risk Levels:**
-- Low — risk score 0–39 — message appears legitimate
-- Medium — risk score 40–69 — suspicious, requires human review
-- High — risk score 70–100 — high probability of exploitation attempt
-
----
-
-## Why NLP Over Rule-Based Systems
-
-Rule-based systems detect only known patterns — for example blocking messages 
-containing specific words like "crypto" or "transfer now". They are brittle 
-and easily bypassed as scammers constantly evolve their language.
-
-This NLP model learns statistical relationships across thousands of examples 
-of exploitation language. It can detect new manipulation tactics even when 
-exact words change — because it classifies on underlying linguistic and 
-behavioural patterns rather than fixed rules.
 
 ---
 
 ## Example Outputs
 
-**Example 1 — High Risk Scam:**
+**Example 1 : Obvious Scam:**
 ```python
 analyse_message("URGENT! Send money now to my account. Trust me don't worry. Limited time offer!")
-# Output:
 # {
-#   "risk_score": 99,
-#   "risk_level": "High",
-#   "confidence": 1.0,
+#   "risk_score": 99, "risk_level": "High", "confidence": 1.0,
 #   "triggered_features": ["urgency", "pressure_tactics", "money_request"],
-#   "requires_human_review": True
+#   "requires_human_review": True, "escalate_to_analyst": False
 # }
 ```
 
-**Example 2 — Legitimate Message:**
+**Example 2 : Legitimate Message:**
 ```python
 analyse_message("Hey, are we still meeting for lunch tomorrow?")
-# Output:
 # {
-#   "risk_score": 1,
-#   "risk_level": "Low",
-#   "confidence": 0.01,
+#   "risk_score": 0, "risk_level": "Low", "confidence": 0.0,
 #   "triggered_features": [],
-#   "requires_human_review": False
+#   "requires_human_review": False, "escalate_to_analyst": False
 # }
 ```
 
-**Example 3 — Social Media Impersonation:**
+**Example 3 : Social Media Impersonation (no obvious keywords):**
 ```python
-analyse_message("Hi it's me, I need you to transfer money urgently to this account, don't tell anyone please")
-# Output:
+analyse_message("omg you won't believe this, it's James, phone died using a mates, can you spot me fifty quid")
 # {
-#   "risk_score": 97,
-#   "risk_level": "High",
-#   "confidence": 0.98,
-#   "triggered_features": ["urgency", "money_request", "secrecy_tactics"],
-#   "requires_human_review": True
+#   "risk_score": 99, "risk_level": "High", "confidence": 1.0,
+#   "triggered_features": ["suspicious_language_pattern"],
+#   "requires_human_review": True, "escalate_to_analyst": False
 # }
 ```
 
-**Example 4 — Crypto Investment Scam:**
+**Example 4 : Romance Scam with Escalation:**
 ```python
-analyse_message("I made £500 in one day on this platform, you only need to invest £200 to start, DM me for the link")
-# Output:
+analyse_message("My darling I need your help, I am stuck at customs and need £300, please send urgently, don't tell anyone")
 # {
-#   "risk_score": 78,
-#   "risk_level": "High",
-#   "confidence": 0.79,
-#   "triggered_features": ["money_request"],
-#   "requires_human_review": True
-# }
-```
-
-**Example 5 — Romance Scam:**
-```python
-analyse_message("My darling I need your help, I am stuck at customs and need £300 for fees, please send urgently, don't tell anyone")
-# Output:
-# {
-#   "risk_score": 99,
-#   "risk_level": "High",
-#   "confidence": 0.99,
+#   "risk_score": 99, "risk_level": "High", "confidence": 1.0,
 #   "triggered_features": ["urgency", "secrecy_tactics"],
-#   "requires_human_review": True
+#   "requires_human_review": True, "escalate_to_analyst": True
+# }
+```
+
+**Example 5 : Legitimate Urgent Money Request (correctly not flagged):**
+```python
+analyse_message("can you send the rent money today, landlord's chasing me and I don't want a late fee")
+# {
+#   "risk_score": 0, "risk_level": "Low", "confidence": 0.0,
+#   "triggered_features": [],
+#   "requires_human_review": False, "escalate_to_analyst": False
 # }
 ```
 
 ---
 
-## Data Sources
+## Download the Model
 
-| Dataset | Source | Why It's Useful |
-|---|---|---|
-| UCI SMS Spam Collection | archive.ics.uci.edu/dataset/228 | Labelled spam/scam messages for NLP training |
-| Kaggle Scam Detection Dataset | kaggle.com/datasets/noorsaeed/scam-detection-dataset | Scam-specific patterns |
-| Synthetic Scam Dataset | Team generated | Modern digital exploitation patterns — social media impersonation, crypto scams, romance scams, fake emergencies, phishing |
+The BERT model file (`model.safetensors`) is 417MB and exceeds GitHub's 
+100MB file size limit. Download it separately and place it in the 
+`scamshield_bert_model/` folder before running the notebook.
+
+**Download:** [Add Google Drive link here]
+
+Place the downloaded file at:
+```
+nlp-model/scamshield_bert_model/model.safetensors
+```
+
+The remaining model files (config.json, tokenizer files, vocab.txt) are 
+already included in this repository.
 
 ---
 
@@ -184,13 +218,14 @@ analyse_message("My darling I need your help, I am stuck at customs and need £3
 
 | File | Description |
 |---|---|
-| scamshield_nlp.ipynb | Main Jupyter notebook — full pipeline |
-| scamshield_model.pkl | Saved trained model |
-| tfidf_vectorizer.pkl | Saved TF-IDF vectorizer |
-| requirements.txt | Python libraries required |
-| spam.csv | UCI SMS Spam Collection dataset |
-| SMS Spam Dataset.csv | Kaggle Scam Detection dataset |
-| synthetic_scam_data.csv | Team-generated synthetic scam conversations |
+| scamshield_nlp.ipynb | Main Jupyter notebook : full BERT pipeline |
+| scamshield_bert_model/ | Fine-tuned BERT model folder (model.safetensors downloaded separately) |
+| scamshield_model.pkl | TF-IDF model (baseline : kept for reference) |
+| tfidf_vectorizer.pkl | TF-IDF vectorizer (baseline : kept for reference) |
+| synthetic_scam_data.csv | Synthetic dataset v1 (1,300 messages) |
+| synthetic_scam_data_v2.csv | Synthetic dataset v2 (1,400 messages, more diverse) |
+| test_set_50.csv | 50-message evaluation set used for model comparison |
+| requirements.txt | Python dependencies |
 | README.md | This file |
 
 ---
@@ -198,23 +233,24 @@ analyse_message("My darling I need your help, I am stuck at customs and need £3
 ## How to Run
 
 ### Prerequisites
-Make sure you have Python 3.11+ installed.
+Python 3.11+ and the following libraries:
 
-### Step 1 — Install dependencies
 ```bash
-pip install -r requirements.txt
+pip install transformers torch scikit-learn pandas
 ```
 
-### Step 2 — Open the notebook
+### Step 1 : Download the model file
+Download `model.safetensors` from the link above and place it in 
+`scamshield_bert_model/`.
+
+### Step 2 : Open the notebook
 ```bash
 jupyter notebook scamshield_nlp.ipynb
 ```
-Or open directly in VS Code by clicking scamshield_nlp.ipynb
 
-### Step 3 — Run all cells
-Run all cells in order from top to bottom using Shift + Enter
+### Step 3 : Run all cells in order
 
-### Step 4 — Use the analyse_message function
+### Step 4 : Use analyse_message
 ```python
 result = analyse_message("Your message here")
 print(result)
@@ -222,34 +258,12 @@ print(result)
 
 ---
 
-## Using the Saved Model
-
-To load and use the saved model without running the full notebook:
-
-```python
-import pickle
-import scipy.sparse as sp
-
-# Load model and vectorizer
-with open('scamshield_model.pkl', 'rb') as f:
-    model = pickle.load(f)
-
-with open('tfidf_vectorizer.pkl', 'rb') as f:
-    tfidf = pickle.load(f)
-
-# Use the analyse_message function from the notebook
-result = analyse_message("Hi it's me, I need you to transfer money urgently, don't tell anyone please")
-print(result)
-```
-
----
-
 ## API Integration
 
-The backend service (Person 2) loads the saved model files and wraps the 
-analyse_message function into a REST API endpoint.
+The backend service (Person 2) loads the BERT model and wraps 
+`analyse_message` into a REST API endpoint.
 
-**Expected API call:**
+**Expected request:**
 ```json
 POST /analyse
 {
@@ -257,14 +271,15 @@ POST /analyse
 }
 ```
 
-**Expected API response:**
+**Expected response:**
 ```json
 {
   "risk_score": 87,
   "risk_level": "High",
   "confidence": 0.87,
   "triggered_features": ["urgency", "money_request"],
-  "requires_human_review": true
+  "requires_human_review": true,
+  "escalate_to_analyst": false
 }
 ```
 
@@ -272,21 +287,41 @@ POST /analyse
 
 ## Responsible AI & Data Disclosure
 
-**Synthetic Data:** 1,300 messages in the training dataset were synthetically 
-generated by the team. This was done to address the lack of publicly available 
-modern digital exploitation datasets covering social media impersonation, 
-crypto scams, and romance scams. All synthetic data is clearly labelled and 
-disclosed transparently.
+**Model:** Fine-tuned BERT (bert-base-uncased). A transformer-based model 
+was chosen over simpler approaches because it understands contextual meaning, 
+not just keyword frequency — making it harder for scammers to evade detection 
+by rephrasing messages. Known limitation: the model was fine-tuned on 
+synthetic data which, while diverse, may not cover all real-world scam 
+variations. Continuous retraining on confirmed real scam reports is the 
+identified next step.
+
+**Synthetic Data:** 2,700 messages in the training dataset were synthetically 
+generated by the team across two versions (v1 and v2). This was necessary 
+because no publicly available dataset exists specifically for modern digital 
+financial exploitation patterns on social media platforms. All synthetic data 
+is clearly labelled and disclosed. Both CSV files are included in the repository.
 
 **Privacy:** The model analyses message content in real time and never stores 
 message text. Only the risk score and triggered features are retained.
 
-**Human in the Loop:** The model never makes autonomous decisions. All 
-high-risk and medium-risk flags require human review before any action is taken.
+**Human in the Loop:** The model never makes autonomous decisions. Medium and 
+High risk flags require user confirmation after a cooling-off period. Critical 
+cases (risk score 90+ with secrecy tactics detected) are escalated to a human 
+fraud analyst and cannot be overridden by the user.
+
+**False Positives:** Legitimate urgent money requests between friends (rent, 
+splitting bills) are correctly identified as low risk. False positive rate is 
+tracked as a primary performance metric and explained alerts allow users to 
+override incorrect flags.
+
+**Future Work:** BERT fine-tuning with larger, more diverse real-world scam 
+datasets; writing style deviation detection to flag when someone writes 
+differently from their established communication pattern; multi-turn 
+conversation analysis to detect escalating pressure across multiple messages.
 
 ---
 
 ## Built By
-Sukhnaaz Kaur
+Sukhnaaz Kaur : NLP & AI Model
 
-Team Ctrl Alt Elite — USAII Global AI Hackathon 2026
+Team Ctrl Alt Elite : USAII Global AI Hackathon 2026
