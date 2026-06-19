@@ -223,7 +223,7 @@ The remaining model files (`config.json`, tokenizer files, `vocab.txt`) are alre
 5. Choose to cancel the action or proceed despite the warning.
 6. High-risk cases can be escalated to a human fraud analyst for review.
 
-####Screens
+### Screens
 
 - Message Analysis Screen
 - Risk Assessment Results
