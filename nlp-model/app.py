@@ -1,28 +1,29 @@
-"""FastAPI wrapper around the trained ScamShield NLP model."""
+"""FastAPI wrapper around the fine-tuned ScamShield BERT model."""
 
 from __future__ import annotations
 
-import pickle
 import re
 from contextlib import asynccontextmanager
 from typing import List
 
-import scipy.sparse as sp
+import torch
 from fastapi import FastAPI
 from pydantic import BaseModel
+from transformers import AutoModelForSequenceClassification, AutoTokenizer
 
+MODEL_DIR = "scamshield_bert_model"
+MAX_LENGTH = 256
 
+tokenizer = None
 model = None
-tfidf = None
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    global model, tfidf
-    with open("scamshield_model.pkl", "rb") as f:
-        model = pickle.load(f)
-    with open("tfidf_vectorizer.pkl", "rb") as f:
-        tfidf = pickle.load(f)
+    global tokenizer, model
+    tokenizer = AutoTokenizer.from_pretrained(MODEL_DIR)
+    model = AutoModelForSequenceClassification.from_pretrained(MODEL_DIR)
+    model.eval()
     yield
 
 
@@ -78,18 +79,18 @@ class PredictResponse(BaseModel):
 @app.post("/predict", response_model=PredictResponse)
 def predict(req: PredictRequest) -> PredictResponse:
     msg = req.message
-    urgency  = _count_urgency(msg)
-    pressure = _count_pressure(msg)
-    money    = _count_money(msg)
-    links    = _count_links(msg)
-    secrecy  = _count_secrecy(msg)
 
-    tfidf_vec = tfidf.transform([msg])
-    custom    = [[urgency, pressure, money, links, secrecy, len(msg), len(msg.split())]]
-    features  = sp.hstack([tfidf_vec, custom])
-
-    probability = float(model.predict_proba(features)[0][1])
-    risk_score  = int(probability * 100)
+    inputs = tokenizer(
+        msg,
+        return_tensors="pt",
+        truncation=True,
+        max_length=MAX_LENGTH,
+        padding=True,
+    )
+    with torch.no_grad():
+        logits = model(**inputs).logits
+    probability = float(torch.softmax(logits, dim=-1)[0][1])  # P(class 1 = scam)
+    risk_score = int(probability * 100)
 
     if risk_score >= 70:
         risk_level = "HIGH"
@@ -97,6 +98,12 @@ def predict(req: PredictRequest) -> PredictResponse:
         risk_level = "MEDIUM"
     else:
         risk_level = "LOW"
+
+    urgency  = _count_urgency(msg)
+    pressure = _count_pressure(msg)
+    money    = _count_money(msg)
+    links    = _count_links(msg)
+    secrecy  = _count_secrecy(msg)
 
     triggered: List[str] = []
     if urgency  > 0: triggered.append("urgency")
