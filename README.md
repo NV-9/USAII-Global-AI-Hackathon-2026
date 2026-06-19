@@ -155,6 +155,26 @@ Requires `nlp-model/scamshield_bert_model/model.safetensors` to be downloaded fi
 
 ---
 
+## Decision Impact Statement
+
+**Core problem:** Scams succeed not because detection failed, but because detection was not shared across platforms.
+
+**Before ThinkAgainAI AI:**
+
+A victim receives a message appearing to be from a trusted contact requesting an urgent transfer of £500. They comply. The transaction is completed on a payment platform that had no visibility of the suspicious conversation that preceded it. Each platform operated in isolation, detection, where it existed at all, was siloed and arrived too late to prevent financial loss.
+
+**After ThinkAgainAI AI:**
+
+The same message is analysed in real time at the point of receipt. The model identifies impersonation patterns, urgency signals, and isolation tactics simultaneously. A risk alert is broadcast to all registered payment platforms before the victim initiates a transfer. At the point of payment, the user receives a plain-language explanation of the specific signals detected, not a generic disclaimer. A mandatory cooling-off period is enforced, preserving time for independent verification. The transaction does not proceed unchallenged.
+
+Medium risk cases surface a contextual warning the user may override immediately, avoiding friction on legitimate payments. High risk cases with isolation tactics detected are escalated directly to a human fraud analyst. No autonomous financial decision is made by the system at any tier.
+
+**What changes:**
+
+The structural gap between messaging platforms and payment platforms closes. A scammer who initiates manipulation on one platform and extracts payment on another can no longer exploit the absence of a shared signal. The risk score travels with the alert, not with the message content.
+
+---
+
 ## Model Update Experiments (what we tried, and what's actually deployed)
 
 While verifying a clean Docker rebuild, the committed `nlp-model/scamshield_bert_model/config.json` declared 3 output labels but the local `model.safetensors` file was an older binary (2-class) checkpoint — the two were out of sync, which crashed the `nlp` service on a fresh rebuild.
