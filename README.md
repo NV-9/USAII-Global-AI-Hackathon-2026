@@ -8,7 +8,7 @@ Unlike traditional rule-based systems that scammers easily bypass by altering ke
 
 | Role | Member |
 |---|---|
-| AI Model + NLP | Naaz (Sukhnaaz Kaur) |
+| AI Model + NLP | Naaz |
 | Backend + Alert System | Vish |
 | Frontend / Dashboard | Aaron |
 | Data + Testing + Video | Emmanuel |
