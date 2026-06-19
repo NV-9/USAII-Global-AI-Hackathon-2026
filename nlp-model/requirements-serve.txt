@@ -1,0 +1,4 @@
+fastapi==0.137.2
+uvicorn==0.49.0
+transformers==5.12.1
+torch==2.12.1+cpu

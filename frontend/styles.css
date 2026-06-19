@@ -32,6 +32,15 @@ body {
 nav {
   padding: 20px 40px;
   border-bottom: 1px solid var(--border);
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.nav-links {
+  display: flex;
+  gap: 24px;
 }
 
 .logo {
@@ -162,6 +171,26 @@ textarea:focus {
   font-family: "Space Grotesk", sans-serif;
   font-size: 1.3rem;
   font-weight: 700;
+  color: var(--red);
+}
+
+.result.low .risk-badge,
+.result.low .risk-score {
+  background: rgba(46, 204, 113, 0.15);
+  color: var(--green);
+}
+
+.result.medium .risk-badge,
+.result.medium .risk-score {
+  background: rgba(243, 156, 18, 0.15);
+  color: var(--amber);
+}
+
+.result.high .risk-badge,
+.result.high .risk-score,
+.result.critical .risk-badge,
+.result.critical .risk-score {
+  background: rgba(231, 76, 60, 0.15);
   color: var(--red);
 }
 
@@ -322,4 +351,31 @@ textarea:focus {
 .btn-dismiss:hover {
   background: #302261;
   transform: translateY(-1px);
+}
+
+main.single-column {
+  display: block;
+  max-width: 800px;
+}
+
+.escalation-item {
+  padding: 18px 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.escalation-item:last-child {
+  border-bottom: none;
+}
+
+.escalation-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.escalation-id {
+  color: var(--muted);
+  font-size: 0.8rem;
+  font-family: "Space Grotesk", sans-serif;
 }
