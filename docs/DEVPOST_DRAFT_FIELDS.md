@@ -1,4 +1,4 @@
-# ScamShield AI — Devpost Draft Fields
+# ThinkAgainAI — Devpost Draft Fields
 
 Use this as a starting point. Adjust after final frontend/backend testing.
 
@@ -8,7 +8,7 @@ Cross-platform AI alerts for financial exploitation and impersonation scams.
 
 ## AI Architecture Explanation, max 600 characters
 
-ScamShield AI takes synthetic or user-consented message snippets plus platform context as input. An NLP classifier analyses TF-IDF text features and scam-specific behavioural signals such as urgency, secrecy, money requests, suspicious links, pressure, and impersonation markers. It outputs a risk score, risk level, confidence, triggered features, recommended action, and whether human review is required. High-risk cases trigger a simulated cross-platform alert containing risk metadata, not raw message content.
+ThinkAgainAI takes synthetic or user-consented message snippets plus platform context as input. An NLP classifier analyses TF-IDF text features and scam-specific behavioural signals such as urgency, secrecy, money requests, suspicious links, pressure, and impersonation markers. It outputs a risk score, risk level, confidence, triggered features, recommended action, and whether human review is required. High-risk cases trigger a simulated cross-platform alert containing risk metadata, not raw message content.
 
 Character count: 595 including spaces.
 

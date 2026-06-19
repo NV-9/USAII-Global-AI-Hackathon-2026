@@ -1,5 +1,5 @@
 """
-ScamShield Backend API — entry point.
+ThinkAgainAI Backend API — entry point.
 """
 
 from __future__ import annotations
@@ -61,7 +61,7 @@ def health() -> HealthResponse:
 @app.get("/", tags=["Meta"], include_in_schema=False)
 def root():
     return {
-        "message": "ScamShield Backend API is running.",
+        "message": "ThinkAgainAI Backend API is running.",
         "docs": "/docs",
         "health": "/health",
     }

@@ -90,6 +90,62 @@ async function loadAlerts() {
         console.error(err);
     }
 }
+let allAlertsPage = 1;
+const ALL_ALERTS_PAGE_SIZE = 10;
+
+function formatAlertTimestamp(isoString) {
+    if (!isoString) return "";
+    return new Date(isoString).toLocaleString(undefined, {
+        dateStyle: "medium",
+        timeStyle: "short",
+    });
+}
+
+async function loadAllAlerts(page = 1) {
+    const container = document.getElementById("AllAlertsList");
+    if (!container) return;
+
+    try {
+        const response = await fetch(`${API_BASE}/alerts?page=${page}&page_size=${ALL_ALERTS_PAGE_SIZE}`);
+        const data = await response.json();
+
+        allAlertsPage = data.page;
+
+        if (!data.alerts || data.alerts.length === 0) {
+            container.innerHTML = "<p>No alerts available.</p>";
+        } else {
+            container.innerHTML = data.alerts.map(alert => `
+                <div class="alert-item">
+                    <div class="alert-dot ${alert.risk_level.toLowerCase()}"></div>
+                    <span>
+                        ${alert.risk_level} Risk
+                        (Score: ${alert.risk_score})
+                    </span>
+                    <span class="alert-timestamp">${formatAlertTimestamp(alert.created_at)}</span>
+                </div>
+            `).join("");
+        }
+
+        const pagination = document.getElementById("alertsPagination");
+        const pageInfo = document.getElementById("alertsPageInfo");
+        const prevBtn = document.getElementById("alertsPrevBtn");
+        const nextBtn = document.getElementById("alertsNextBtn");
+        if (pagination) {
+            pagination.style.display = data.total > 0 ? "flex" : "none";
+            pageInfo.textContent = `Page ${data.page} of ${data.total_pages} (${data.total} total)`;
+            prevBtn.disabled = data.page <= 1;
+            nextBtn.disabled = data.page >= data.total_pages;
+        }
+    } catch (err) {
+        console.error(err);
+        container.innerHTML = "<p>Failed to load alerts.</p>";
+    }
+}
+
+function changeAlertsPage(delta) {
+    loadAllAlerts(allAlertsPage + delta);
+}
+
 function showEscalationPanel(escalationId) {
     document.getElementById("decisionPanel").style.display = "none";
 
@@ -243,5 +299,6 @@ async function resolveEscalation(escalationId, resolution) {
 
 document.addEventListener("DOMContentLoaded", () => {
     loadAlerts();
+    loadAllAlerts();
     loadEscalations();
 });

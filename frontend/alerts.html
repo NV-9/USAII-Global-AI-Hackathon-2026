@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <title>ScamShield AI - Alerts</title>
+  <title>ThinkAgainAI - Alerts</title>
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -19,14 +19,14 @@
 <body>
 
   <nav>
-    <div class="logo">
+    <a href="index.html" class="logo">
       <div class="logo-icon">🛡️</div>
-      ScamShield AI
-    </div>
+      ThinkAgainAI
+    </a>
 
     <div class="nav-links">
-      <a href="index.html" class="nav-link">← Analyse Messages</a>
-      <a href="analyst.html" class="nav-link">Analyst Dashboard →</a>
+      <a href="index.html" class="nav-link">Analyse Messages</a>
+      <a href="analyst.html" class="nav-link">Analyst Dashboard</a>
     </div>
   </nav>
 
@@ -37,11 +37,17 @@
       <h1>Alert Notifications</h1>
 
       <p class="subtitle">
-        Recent high-risk scam alerts broadcast to connected platforms.
+        All high-risk scam alerts broadcast to connected platforms.
       </p>
 
       <div id="AllAlertsList">
         Loading alerts...
+      </div>
+
+      <div class="pagination" id="alertsPagination" style="display: none;">
+        <button id="alertsPrevBtn" class="btn-override" onclick="changeAlertsPage(-1)">← Prev</button>
+        <span id="alertsPageInfo"></span>
+        <button id="alertsNextBtn" class="btn-override" onclick="changeAlertsPage(1)">Next →</button>
       </div>
 
     </section>

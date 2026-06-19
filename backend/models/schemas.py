@@ -102,6 +102,9 @@ class AlertRecord(BaseModel):
 
 class AlertListResponse(BaseModel):
     total: int
+    page: int
+    page_size: int
+    total_pages: int
     alerts: List[AlertRecord]
 
 class FeedbackRequest(BaseModel):
