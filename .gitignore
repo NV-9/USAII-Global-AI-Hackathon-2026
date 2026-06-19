@@ -1,4 +1,5 @@
-nlp-model/scamshield_bert_model/model.safetensors
+**/model.safetensors
+nlp-model/.train_venv/
 .DS_Store
 *.pkl
 __pycache__/

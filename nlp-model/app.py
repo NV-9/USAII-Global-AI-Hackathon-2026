@@ -89,15 +89,13 @@ def predict(req: PredictRequest) -> PredictResponse:
     )
     with torch.no_grad():
         logits = model(**inputs).logits
-    probability = float(torch.softmax(logits, dim=-1)[0][1])  # P(class 1 = scam)
-    risk_score = int(probability * 100)
+    probs = torch.softmax(logits, dim=-1)[0]  # [P(low), P(medium), P(high)]
+    p_low, p_medium, p_high = (float(p) for p in probs)
 
-    if risk_score >= 70:
-        risk_level = "HIGH"
-    elif risk_score >= 40:
-        risk_level = "MEDIUM"
-    else:
-        risk_level = "LOW"
+    predicted_idx = int(torch.argmax(probs))
+    risk_level = {0: "LOW", 1: "MEDIUM", 2: "HIGH"}[predicted_idx]
+    probability = float(probs[predicted_idx])
+    risk_score = round(p_medium * 50 + p_high * 100)
 
     urgency  = _count_urgency(msg)
     pressure = _count_pressure(msg)
