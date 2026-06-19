@@ -327,10 +327,7 @@ The BERT model file (`model.safetensors`) is 417MB and exceeds GitHub's
 100MB file size limit. Download it separately and place it in the 
 `scamshield_bert_model/` folder before running the notebook.
 
-**Download model.safetensors here:**
 https://drive.google.com/file/d/16WYqd8MpCvOCbDI5veZjjyyaC5MzKvzq/view?usp=sharing
-
-Place the downloaded file at:
 
 ## Built By
 Sukhnaaz Kaur : NLP & AI Model
