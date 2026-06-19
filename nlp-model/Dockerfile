@@ -2,9 +2,8 @@ FROM python:3.11-slim
 
 WORKDIR /app
 
-RUN pip install --no-cache-dir fastapi uvicorn
-RUN pip install --no-cache-dir torch --index-url https://download.pytorch.org/whl/cpu
-RUN pip install --no-cache-dir transformers
+COPY requirements-serve.txt .
+RUN pip install --no-cache-dir -r requirements-serve.txt --extra-index-url https://download.pytorch.org/whl/cpu
 
 COPY scamshield_bert_model ./scamshield_bert_model
 COPY app.py ./
