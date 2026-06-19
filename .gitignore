@@ -1,3 +1,8 @@
+nlp-model/scamshield_bert_model/model.safetensors
+.DS_Store
+*.pkl
+__pycache__/
+.ipynb_checkpoints/
 __pycache__/
 *.pyc
 *.pyo
