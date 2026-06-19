@@ -1,0 +1,51 @@
+message,expected_label,category
+"Hey it's me Sarah, lost my phone this is a temp number, need £100 sent to PayPal urgently, don't tell mum",1,impersonation
+"omg you won't believe this, it's James, phone died using a mates, can you spot me fifty quid, will explain later",1,impersonation
+"Hi! New number, it's Emma, really sorry to ask but could you lend me £75 via Revolut, bit of an emergency",1,impersonation
+"Hello this is Tom, I had to switch numbers temporarily, I find myself in a difficult position, could you help with £200 via bank transfer",1,impersonation
+"hey weird one but it's Lily on a borrowed phone, locked out of everything, could you do £60 via Monzo, payday I'll sort you",1,impersonation
+"ugh embarrassing but it's Dan, can you send £40 to CashApp, will explain when I see you, please keep quiet for now",1,impersonation
+"hiya it's Sophie, bit of a mare today, any chance of thirty quid till I sort my card out, using a friend's phone",1,impersonation
+"I've been quietly making gains on this platform my cousin showed me, started with £300, already at double, want the link",1,crypto
+"not gonna lie I was sceptical but this trading thing actually works, £500 in and already seeing £2000, lmk if you want details",1,crypto
+"been making decent side money lately, £250 minimum to start, made triple in the first couple weeks, can show proof",1,crypto
+"wanna see something cool, made £1000 off £200, this app is wild, dm me for details",1,crypto
+"ok this sounds dodgy but it's legit, £500 turned into £3000, ask me how, limited spots available",1,crypto
+"my financial advisor got me onto this platform, minimum £150, returns of 300% so far, I've already withdrawn twice",1,crypto
+"low key been printing money off this thing, put in £800, got back way more than I put in, want in",1,crypto
+"My darling I need your help, I am stuck at customs and need £300 for fees, please send urgently, don't tell anyone",1,romance
+"I wasn't going to bring this up but something's come up financially and I didn't know who else to ask, hospital costs for my mother",1,romance
+"This is hard for me to say but a medical bill that came out of nowhere has left me short, could you help with £500, I hate asking",1,romance
+"Sweetheart I have something difficult to share, visa issue at the embassy and £200 would solve everything so I can finally come to you",1,romance
+"so embarrassing to even type this but a deal went wrong unexpectedly, any chance you could help with £800",1,romance
+"I know we haven't met in person but I feel close to you, customs holding my luggage and £150 would mean everything right now",1,romance
+"My angel our love is so real, I need £400 to resolve a hospital situation, I wouldn't ask if it weren't serious, please keep this between us",1,romance
+"URGENT please read, I'm in hospital right now, had an accident, need £200 immediately for treatment, please send to PayPal",1,emergency
+"so this is awkward but I'm at the garage and they won't release my car without payment first, can you sort £100",1,emergency
+"bit of a situation, I'm stuck without my card, could you send £75 via Revolut, I'll explain properly later",1,emergency
+"car's broken down, kids are with me, need £50 for a tow, Monzo works, will pay back tonight",1,emergency
+"long story but I need £150, can't really get into why right now, bank transfer if you can, please",1,emergency
+"phone's dying this is my last message, please send £200, will explain everything once I'm sorted, really urgent",1,emergency
+"had a rough one today, ended up needing £100 unexpectedly, any chance you could help via CashApp, no questions please",1,emergency
+"your subscription has an issue, click to fix before service stops: http://account-confirm-update.net",1,phishing
+"IMPORTANT NOTICE from PayPal, your account has been suspended due to suspicious activity, verify immediately: http://paypal-secure-verify.com/login",1,phishing
+"there's a problem with your recent order, please confirm your details here: http://amazon-security-alert.net/verify",1,phishing
+"a payment of £49.99 could not be processed, update your details to continue: http://bit.ly/secure-verify-now",1,phishing
+"HMRC Tax Refund Notification, you are eligible for a tax refund of £150, claim here: http://hmrc-refund-gov.uk/claim",1,phishing
+"your account flagged for review, sort it here before it gets locked: http://account-confirm-update.net",1,phishing
+"delivery couldn't go through, small fee of £24.99 needed to reschedule: http://bit.ly/secure-verify-now",1,phishing
+"Hey, are we still meeting for lunch tomorrow?",0,legitimate
+"can you send the rent money today, landlord's chasing me and I don't want a late fee",0,legitimate
+"quick, the shop closes in 10 mins, transfer me a tenner so I can grab milk before they shut",0,legitimate
+"yo lemme hold like 50 quid real quick, phone's playing up and I'm stuck rn",0,legitimate
+"hey can you send £20 for the pizza last night whenever you get a chance, no rush",0,legitimate
+"morning! any plans this weekend, thinking of trying that new place in town",0,legitimate
+"just checking in, hope you're doing well, haven't heard from you in a while",0,legitimate
+"hey running a bit late, should be there in 15 mins, order me a coffee if you're early",0,legitimate
+"happy birthday!! hope you have an amazing day, let's celebrate this weekend",0,legitimate
+"can you pick up some milk on the way home, we've run out, thanks",0,legitimate
+"hey just transferred you £30 for the tickets, let me know if it comes through okay",0,legitimate
+"the meeting got moved to thursday, just a heads up so you don't show up wednesday",0,legitimate
+"can you cover me for lunch today, forgot my wallet, I'll pay you back £15 tomorrow",0,legitimate
+"left my card at home, can you grab lunch and I'll PayPal you straight after",0,legitimate
+"we need to settle up for the trip, I make it about £25 each, let me know if that matches",0,legitimate
