@@ -153,7 +153,7 @@ async function proceedAnyway() {
             body: JSON.stringify({
                 analysis_id: currentAnalysisId,
                 session_id: sessionId,
-                action: "override"x
+                action: "override"
             })
         });
 
