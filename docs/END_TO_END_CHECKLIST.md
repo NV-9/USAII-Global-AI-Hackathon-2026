@@ -1,4 +1,4 @@
-# ThinkAgainAI — End-to-End Testing Checklist
+# SafeGuard Ai — End-to-End Testing Checklist
 
 ## 1. Setup checks
 
