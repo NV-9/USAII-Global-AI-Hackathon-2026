@@ -1,6 +1,3 @@
-# SafeGuard AI — Devpost Draft Fields
-
-Use this as a starting point. Adjust after final frontend/backend testing.
 
 ## Tagline, max 80 characters
 
@@ -27,10 +24,6 @@ Character count: 476 including spaces.
 ## Data Sources, max 800 characters
 
 We used synthetic and public/simulated data only. Synthetic scam conversations were team-generated to represent modern exploitation patterns including friend/family impersonation, fake emergency requests, crypto/investment scams, gift-card requests, phishing links, urgency, secrecy, and payment-warning bypass instructions. The NLP model documentation also lists public SMS/spam-style datasets and a team-generated synthetic scam dataset. No real private messages, confidential case files, or identifiable personal data were used. Test cases were manually labelled by expected risk level and expected behavioural features for prototype evaluation.
-
-## Tools Used, max 800 characters
-
-Update this after the team confirms final tools. Draft: Python, FastAPI, REST APIs, JSON webhooks, Docker/Docker Compose, PostgreSQL, scikit-learn/Logistic Regression, TF-IDF vectorization, custom scam-feature extraction, GitHub, and frontend tools used by the dashboard team. AI assistance used: ChatGPT for planning, synthetic test-case generation, documentation drafting, and video-script support. All AI-assisted work was reviewed and adapted by the team before submission.
 
 ## Testing/Evaluation paragraph for project description
 
