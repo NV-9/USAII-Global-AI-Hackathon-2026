@@ -1,4 +1,4 @@
-# SafeGuard Ai — Devpost Draft Fields
+# SafeGuard AI — Devpost Draft Fields
 
 Use this as a starting point. Adjust after final frontend/backend testing.
 
@@ -8,7 +8,7 @@ Cross-platform AI alerts for financial exploitation and impersonation scams.
 
 ## AI Architecture Explanation, max 600 characters
 
-SafeGuard Ai takes synthetic or user-consented message snippets plus platform context as input. An NLP classifier analyses TF-IDF text features and scam-specific behavioural signals such as urgency, secrecy, money requests, suspicious links, pressure, and impersonation markers. It outputs a risk score, risk level, confidence, triggered features, recommended action, and whether human review is required. High-risk cases trigger a simulated cross-platform alert containing risk metadata, not raw message content.
+SafeGuard AI takes synthetic or user-consented message snippets plus platform context as input. An NLP classifier analyses TF-IDF text features and scam-specific behavioural signals such as urgency, secrecy, money requests, suspicious links, pressure, and impersonation markers. It outputs a risk score, risk level, confidence, triggered features, recommended action, and whether human review is required. High-risk cases trigger a simulated cross-platform alert containing risk metadata, not raw message content.
 
 Character count: 595 including spaces.
 
@@ -27,10 +27,6 @@ Character count: 476 including spaces.
 ## Data Sources, max 800 characters
 
 We used synthetic and public/simulated data only. Synthetic scam conversations were team-generated to represent modern exploitation patterns including friend/family impersonation, fake emergency requests, crypto/investment scams, gift-card requests, phishing links, urgency, secrecy, and payment-warning bypass instructions. The NLP model documentation also lists public SMS/spam-style datasets and a team-generated synthetic scam dataset. No real private messages, confidential case files, or identifiable personal data were used. Test cases were manually labelled by expected risk level and expected behavioural features for prototype evaluation.
-
-## Tools Used, max 800 characters
-
-Update this after the team confirms final tools. Draft: Python, FastAPI, REST APIs, JSON webhooks, Docker/Docker Compose, PostgreSQL, scikit-learn/Logistic Regression, TF-IDF vectorization, custom scam-feature extraction, GitHub, and frontend tools used by the dashboard team. AI assistance used: ChatGPT for planning, synthetic test-case generation, documentation drafting, and video-script support. All AI-assisted work was reviewed and adapted by the team before submission.
 
 ## Testing/Evaluation paragraph for project description
 
