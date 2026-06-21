@@ -1,3 +1,6 @@
+# SafeGuard AI — Devpost Draft Fields
+
+Use this as a starting point. Adjust after final frontend/backend testing.
 
 ## Tagline, max 80 characters
 

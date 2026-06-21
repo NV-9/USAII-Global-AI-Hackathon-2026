@@ -1,4 +1,4 @@
-# ThinkAgainAI — API Smoke Tests
+# SafeGuard Ai — API Smoke Tests
 
 Assumption: backend is running at `http://localhost:8000`.
 
