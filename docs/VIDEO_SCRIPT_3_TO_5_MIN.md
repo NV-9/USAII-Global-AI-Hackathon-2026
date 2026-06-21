@@ -1,4 +1,4 @@
-# ThinkAgainAI — 3 to 5 Minute Pitch Video Script
+# SafeGuard AI — 3 to 5 Minute Pitch Video Script
 
 Target length: 4 minutes  
 Speaker: Emmanuel or split between team members  
@@ -8,7 +8,7 @@ Replace bracketed text with actual demo details once Aaron's frontend is ready.
 
 Digital exploitation is becoming harder to detect because scams no longer happen in one place. A fraudster may start by impersonating a friend or family member on social media, then push the victim to send money through a banking or payment app. The issue is not only detection. The deeper issue is fragmentation: one platform may see suspicious behaviour, while another platform has no context at all.
 
-ThinkAgainAI addresses that gap by turning fragmented scam signals into explainable risk alerts for human review.
+SafeGuard AI addresses that gap by turning fragmented scam signals into explainable risk alerts for human review.
 
 ## 0:30–1:15 — Who it is for and scope
 
@@ -48,5 +48,5 @@ Another risk is false positives. A legitimate urgent payment should not be treat
 
 ## 4:10–4:30 — Close/impact
 
-ThinkAgainAI helps protection teams detect exploitation earlier, coordinate risk signals across fragmented platforms, and keep humans in control of high-stakes decisions. The prototype is not a production banking system, but it demonstrates the full decision-support workflow: signal, insight, decision, action, and feedback.
+SafeGuard AI helps protection teams detect exploitation earlier, coordinate risk signals across fragmented platforms, and keep humans in control of high-stakes decisions. The prototype is not a production banking system, but it demonstrates the full decision-support workflow: signal, insight, decision, action, and feedback.
 
